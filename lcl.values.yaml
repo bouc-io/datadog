@@ -1,0 +1,46 @@
+datadog:
+  ## If set, this parameter takes precedence over "apiKey".
+  #apiKeyExistingSecret:  # <DATADOG_API_KEY_SECRET>
+  apiKeyExistingSecret: "datadog-secret"
+
+  # datadog.clusterName -- Set a unique cluster name to allow scoping hosts and Cluster Checks easily
+
+  ## The name must be unique and must be dot-separated tokens with the following restrictions:
+  ## * Lowercase letters, numbers, and hyphens only.
+  ## * Must start with a letter.
+  ## * Must end with a number or a letter.
+  ## * Overall length should not be higher than 80 characters.
+  ## Compared to the rules of GKE, dots are allowed whereas they are not allowed on GKE:
+  ## https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1beta1/projects.locations.clusters#Cluster.FIELDS.name
+  #clusterName: # <CLUSTER_NAME>
+  clusterName: "${CLUSTER_NAME}"
+
+  # datadog.tags -- Static tags on every metric/event. `env` is sourced from cluster-vars so
+  # Datadog and the OTel `environment` attribute stay consistent across the stack.
+  tags:
+    - "env:${ENVIRONMENT_ID}"
+
+  # datadog.site -- The site of the Datadog intake to send Agent data to.
+  # (documentation: https://docs.datadoghq.com/getting_started/site/)
+
+  ## Set to 'datadoghq.com' to send data to the US1 site (default).
+  ## Set to 'datadoghq.eu' to send data to the EU site.
+  ## Set to 'us3.datadoghq.com' to send data to the US3 site.
+  ## Set to 'us5.datadoghq.com' to send data to the US5 site.
+  ## Set to 'ddog-gov.com' to send data to the US1-FED site.
+  ## Set to 'ap1.datadoghq.com' to send data to the AP1 site.
+  #site:  # datadoghq.com
+  site: "us5.datadoghq.com"
+
+  # datadog.logLevel -- Set logging verbosity, valid log levels are: trace, debug, info, warn, error, critical, off
+  logLevel: INFO
+
+  ## The Datadog Agent supports many environment variables.
+  ## ref: https://docs.datadoghq.com/agent/docker/?tab=standard#environment-variables
+  #### As per: https://docs.datadoghq.com/agent/troubleshooting/hostname_containers/?tab=helm
+  #### Needed in Bouc.io local cluster setup since it is no cloud provider supported.
+  env:
+    - name: DD_HOSTNAME
+      valueFrom:
+        fieldRef:
+          fieldPath: spec.nodeName
